@@ -31,4 +31,36 @@ describe('useApi Hook', () => {
             expect(result.current.error).toBe(true);
         })
     });
+        test('handles empty meals response', async () => {
+        (global.fetch as jest.Mock)
+            .mockImplementationOnce(() =>
+            Promise.resolve({
+                json: () =>
+                Promise.resolve({
+                    meals: [],
+                }),
+            })
+            );
+        const { result } = renderHook(() => useApi());
+        await waitFor(() => {
+            expect(result.current.loading)
+            .toBe(false);
+            expect(result.current.data.length)
+            .toBe(0);
+            expect(result.current.error)
+            .toBe(false);
+        });
+
+        });
+    test('keeps loading true while request is pending', () => {
+        global.fetch = jest.fn(
+            () => new Promise(() => {})
+        ) as jest.Mock;
+
+        const { result } = renderHook(() => useApi());
+
+        expect(result.current.loading)
+            .toBe(true);
+
+        });
 });

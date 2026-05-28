@@ -11,7 +11,7 @@ export const useApi = () =>{
     try{
     const response = await fetch(`${API_CONFIG.BASE_URL}`)
     const json = await response.json();
-    setData(json.meals);}
+    setData(json.meals || []);}
     catch(err){setError(true);}
     finally {
 
