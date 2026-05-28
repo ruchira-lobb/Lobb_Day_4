@@ -21,4 +21,9 @@ describe('FoodCard Component', () => {
          render( <FoodCard meal={mockMeal} /> ); 
          expect( screen.getByTestId('meal-image') ).toBeTruthy();
          });
+         test('shows fallback category text', () => { 
+            const invalidMeal = {
+                 ...mockMeal, strCategory: null, };
+        render( <FoodCard meal={invalidMeal} /> );
+        expect( screen.getByText('Unknown Category') ).toBeTruthy(); });
 })
