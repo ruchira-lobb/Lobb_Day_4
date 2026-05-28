@@ -13,4 +13,12 @@ describe('FoodCard Component', () => {
         render(<FoodCard meal={mockMeal} />);
         expect(screen.getByText('Pizza')).toBeTruthy();
     })
+    test('renders category correctly', () => {
+        render( <FoodCard meal={mockMeal} /> );
+        expect( screen.getByText('Fast Food') ).toBeTruthy();
+     });
+     test('renders meal image correctly', () => {
+         render( <FoodCard meal={mockMeal} /> ); 
+         expect( screen.getByTestId('meal-image') ).toBeTruthy();
+         });
 })
