@@ -1,30 +1,111 @@
-import {screen, render, waitFor} from '@testing-library/react-native';
+import {render,screen,} from '@testing-library/react-native';
 import HomeScreen from '../screens/HomeScreen';
+import { useApi } from '../hooks/useApi';
+jest.mock('../hooks/useApi');
 
-const mockNavigation = { navigate: jest.fn() } as any;
+const mockNavigation = {
+  navigate: jest.fn(),
+} as any;
+
 const mockRoute = {} as any;
 
-describe('HomeScreen - useApi Hook Integration', () => {
-    test('POSITIVE CASE 1: API call succeeds - should show loading state initially', () => {
-        render(<HomeScreen navigation={mockNavigation} route={mockRoute} />);
-        expect(screen.getByTestId('loading-indicator')).toBeTruthy();
-    });
+describe('HomeScreen', () => {
+  test('shows loading indicator', () => {
+    (useApi as jest.Mock)
+      .mockReturnValue({
+        loading: true,
+        data: [],
+        error: false,
+      });
+    render(
+      <HomeScreen
+        navigation={mockNavigation}
+        route={mockRoute}
+      />
+    );
+    expect(
+      screen.getByTestId('loading-indicator')
+    ).toBeTruthy();
+  });
 
-    test('POSITIVE CASE 1: API call succeeds - should fetch and render food cards after API call', async () => {
-        render(<HomeScreen navigation={mockNavigation} route={mockRoute} />);
-        
-        await waitFor(() => {
-            expect(screen.queryByTestId('loading-indicator')).toBeFalsy();
-        }, { timeout: 5000 });
-        
-        expect(screen.getAllByTestId('food-card')).toBeTruthy();
-    });
+  test('renders food cards after api success', () => {
+    (useApi as jest.Mock)
+      .mockReturnValue({
+        loading: false,
+        error: false,
+        data: [
+          {
+            idMeal: '1',
+            strMeal: 'Pizza',
+          },
+        ],
+      });
 
-    test('POSITIVE CASE 1: API call succeeds - should display FlatList with data', async () => {
-        render(<HomeScreen navigation={mockNavigation} route={mockRoute} />);
-        
-        await waitFor(() => {
-            expect(screen.getByTestId('food-list')).toBeTruthy();
-        }, { timeout: 5000 });
-    });
+    render(
+      <HomeScreen
+        navigation={mockNavigation}
+        route={mockRoute}
+      />
+    );
+
+    expect(
+      screen.getByTestId('food-list')
+    ).toBeTruthy();
+
+    expect(
+      screen.getAllByTestId('food-card')
+        .length
+    ).toBe(1);
+
+  });
+
+  test('shows error message', () => {
+
+    (useApi as jest.Mock)
+      .mockReturnValue({
+        loading: false,
+        error: true,
+        data: [],
+      });
+
+    render(
+      <HomeScreen
+        navigation={mockNavigation}
+        route={mockRoute}
+      />
+    );
+
+    expect(
+      screen.getByText(
+        'Something went wrong'
+      )
+    ).toBeTruthy();
+
+  });
+
+  test('shows empty state', () => {
+
+    (useApi as jest.Mock)
+      .mockReturnValue({
+        loading: false,
+        error: false,
+        data: [],
+      });
+
+    render(
+      <HomeScreen
+        navigation={mockNavigation}
+        route={mockRoute}
+      />
+    );
+
+    expect(
+      screen.getByText(
+        'No food items found'
+      )
+    ).toBeTruthy();
+
+  });
+
 });
+
